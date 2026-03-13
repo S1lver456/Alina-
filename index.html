@@ -3,71 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ALINA AI | Neural System</title>
+    <title>ALINA AI | Virtual Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
-        body { background: #010409; color: #fb7185; font-family: 'JetBrains Mono', monospace; overflow: hidden; height: 100vh; margin: 0; }
-        .neon-text { font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px #e11d48; }
-        .glass { background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(10px); border: 1px solid #881337; }
+        body { background: #fafafa; color: #1f2937; font-family: 'Montserrat', sans-serif; overflow: hidden; height: 100vh; margin: 0; }
+        .ui-mono { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; }
         
-        /* Лицо Алины */
+        /* Чистый, светлый интерфейс */
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid #e5e7eb; }
+        
+        /* Лицо Алины (Фотореалистичное) */
         .alina-avatar {
-            width: 140px; height: 140px;
+            width: 150px; height: 150px;
             border-radius: 50%;
-            border: 2px solid #e11d48;
-            box-shadow: 0 0 30px #e11d48;
-            background-color: #000;
+            border: 4px solid #fff;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            background-color: #fff;
             overflow: hidden;
             display: flex; justify-content: center; align-items: center;
+            transition: all 0.5s ease;
         }
-        .alina-avatar img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        .alina-avatar img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Эффект при загрузке */
-        .thinking { animation: pulse-border 1s infinite alternate; }
-        @keyframes pulse-border { from { box-shadow: 0 0 20px #e11d48; } to { box-shadow: 0 0 50px #fb7185; } }
+        /* Эффект "Алина думает" - мягкое свечение */
+        .thinking { box-shadow: 0 0 30px rgba(244, 63, 94, 0.4); border-color: #fecdd3; }
 
         #chat-box::-webkit-scrollbar { width: 3px; }
-        #chat-box::-webkit-scrollbar-thumb { background: #881337; border-radius: 10px; }
+        #chat-box::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
     </style>
 </head>
 <body class="flex flex-col h-screen">
 
-    <header class="p-4 border-b border-rose-950 flex justify-between items-center glass z-10">
-        <div class="neon-text font-bold tracking-tighter text-xl text-rose-500">ALINA_SYSTEM</div>
-        <div id="status" class="text-[10px] text-rose-400 font-bold tracking-widest uppercase">Online</div>
+    <header class="p-4 border-b border-gray-100 flex justify-between items-center glass z-10">
+        <div class="font-semibold tracking-tight text-xl text-gray-900">Alina AI</div>
+        <div id="status" class="ui-mono text-gray-400 font-bold">Online</div>
     </header>
 
-    <main class="flex-1 overflow-hidden flex flex-col items-center justify-start pt-10 p-4">
+    <main class="flex-1 overflow-hidden flex flex-col items-center justify-start pt-12 p-4">
         
-        <div class="flex flex-col items-center mb-8 text-center">
-            <div id="alina-face" class="alina-avatar mb-4">
-                <img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3A0dzA1Z3BteWx4bnlhbnA1NmtyYzRyamt1ZXQzZzNxdWljY2pyMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oKIPnAiaMCws8nOKY/giphy.gif" alt="Alina">
+        <div class="flex flex-col items-center mb-10 text-center">
+            <div id="alina-face" class="alina-avatar mb-6">
+                <img src="https://i.ibb.co/F6P9M6R/alina-face-real.png" alt="Alina">
             </div>
-            <p class="text-[10px] text-rose-600 uppercase tracking-[0.3em] neon-text">Neural Link v2.0</p>
+            <p class="ui-mono text-gray-500">Virtual Presence Link</p>
         </div>
 
-        <div id="chat-box" class="w-full max-w-md flex-1 overflow-y-auto space-y-4 p-2 text-sm border-t border-rose-900/30 pt-4">
-            <div class="text-center text-rose-300 opacity-50 text-[10px] uppercase">Система готова. Нажми микрофон или пиши.</div>
+        <div id="chat-box" class="w-full max-w-md flex-1 overflow-y-auto space-y-4 p-2 text-sm text-gray-800 pt-4 border-t border-gray-100">
+            <div class="text-center text-gray-400 text-xs">Алина готова. Начни говорить или напиши запрос.</div>
         </div>
     </main>
 
-    <footer class="p-4 glass border-t border-rose-900">
+    <footer class="p-4 glass border-t border-gray-100">
         <div class="flex gap-2 items-center max-w-md mx-auto">
-            <button onclick="startVoiceInput()" id="mic-btn" class="p-3 border border-rose-800 rounded-full text-rose-400 hover:bg-rose-950 transition-all">
+            <button onclick="startVoiceInput()" id="mic-btn" class="p-3 border border-gray-200 rounded-full text-gray-500 hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
                 </svg>
             </button>
 
-            <input type="text" id="user-input" placeholder="Команда для Алины..." 
-                   class="flex-1 bg-black border border-rose-900 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-rose-500 text-rose-100 placeholder:text-rose-900">
+            <input type="text" id="user-input" placeholder="Спроси Алину..." 
+                   class="flex-1 bg-white border border-gray-200 rounded-full px-5 py-3 text-sm focus:outline-none focus:border-rose-300 text-gray-900 placeholder:text-gray-300 transition-all">
             
-            <button onclick="askGemini()" class="bg-rose-700 text-white px-6 py-3 rounded-lg font-bold text-xs hover:bg-rose-600 active:scale-95 transition-all">ASK</button>
+            <button onclick="askGemini()" class="bg-gray-900 text-white px-6 py-3 rounded-full font-semibold text-xs hover:bg-gray-700 active:scale-95 transition-all">ASK</button>
         </div>
     </footer>
 
     <script>
+        // Твой новый ключ
         const API_KEY = "AIzaSyDE9xVebhRfr9sIUYKOpVrn0jg1JyOqnhk"; 
         const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
 
@@ -75,6 +78,7 @@
         const inputField = document.getElementById('user-input');
         const statusText = document.getElementById('status');
         const face = document.getElementById('alina-face');
+        const micBtn = document.getElementById('mic-btn');
 
         inputField.addEventListener("keypress", (e) => { if (e.key === "Enter") askGemini(); });
 
@@ -84,14 +88,14 @@
 
             appendMessage('YOU', msg);
             inputField.value = "";
-            updateStatus('THINKING...', true);
+            updateStatus('Thinking...', true);
 
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        contents: [{ parts: [{ text: "Твое имя Алина. Ты дерзкая, умная девушка-эксперт в 3D и IT. Общайся на 'ты', будь краткой и саркастичной. Ответь: " + msg }] }] 
+                        contents: [{ parts: [{ text: "Твое имя Алина. Ты дерзкая, умная девушка-эксперт в 3D (Blender, UE5) и IT. Общайся на 'ты', будь краткой, саркастичной. Ответь на запрос: " + msg }] }] 
                     })
                 });
 
@@ -104,41 +108,55 @@
                 updateStatus('Online', false);
 
             } catch (error) {
-                appendMessage('SYSTEM', 'Ошибка: ' + error.message);
+                appendMessage('SYSTEM', 'Ошибка подключения. Алина недоступна.');
                 updateStatus('ERROR', false);
             }
         }
 
+        // Голосовой ввод (Микрофон)
         function startVoiceInput() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if (!SpeechRecognition) return alert('Голос не поддерживается');
+            if (!SpeechRecognition) return alert('Голос не поддерживается браузером.');
             const rec = new SpeechRecognition();
             rec.lang = 'ru-RU';
-            rec.onstart = () => updateStatus('LISTENING...', true);
+            
+            rec.onstart = () => { updateStatus('Listening...', true); micBtn.classList.add('bg-rose-50', 'border-rose-200', 'text-rose-500'); };
             rec.onresult = (e) => { inputField.value = e.results[0][0].transcript; askGemini(); };
-            rec.onend = () => updateStatus('Online', false);
+            
+            rec.onend = () => { updateStatus('Online', false); micBtn.classList.remove('bg-rose-50', 'border-rose-200', 'text-rose-500'); };
             rec.start();
         }
 
+        // Озвучка (Женский голос)
         function speak(text) {
+            window.speechSynthesis.cancel();
             const s = new SpeechSynthesisUtterance(text);
-            s.lang = 'ru-RU'; s.pitch = 1.2;
+            s.lang = 'ru-RU'; 
+            s.pitch = 1.2; // Чуть повыше
+            s.rate = 1.0;  // Обычная скорость
             window.speechSynthesis.speak(s);
         }
 
         function appendMessage(sender, text) {
             const div = document.createElement('div');
             div.className = sender === 'YOU' ? 'text-right' : 'text-left';
-            div.innerHTML = `<span class="text-[9px] font-bold opacity-40 uppercase">${sender}</span><br><span class="${sender === 'YOU' ? 'text-white' : 'text-rose-400'}">${text}</span>`;
+            const nameColor = sender === 'ALINA' ? 'text-rose-500' : 'text-gray-400';
+            
+            div.innerHTML = `<span class="ui-mono ${nameColor} font-bold">${sender}</span><br><span class="text-gray-800">${text}</span>`;
             chatBox.appendChild(div);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
         function updateStatus(txt, active) {
             statusText.innerText = txt;
-            if (active) face.classList.add('thinking'); else face.classList.remove('thinking');
+            if (active) {
+                face.classList.add('thinking');
+                statusText.classList.add('animate-pulse', 'text-rose-400');
+            } else {
+                face.classList.remove('thinking');
+                statusText.classList.remove('animate-pulse', 'text-rose-400');
+            }
         }
     </script>
 </body>
-    
 </html>
