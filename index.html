@@ -3,50 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ALINA AI | 3D & Tech</title>
+    <title>ALINA AI | Cyber-Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
-        body { background: #020617; color: #e11d48; font-family: 'JetBrains Mono', monospace; }
-        .neon-text { font-family: 'Orbitron', sans-serif; text-shadow: 0 0 10px #e11d48; }
-        .glass { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); border: 1px solid #4c0519; }
-        .orb {
-            width: 80px; height: 80px;
-            background: radial-gradient(circle, #fb7185 0%, transparent 70%);
+        body { background: #020617; color: #fb7185; font-family: 'JetBrains Mono', monospace; overflow: hidden; }
+        .neon-text { font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px #e11d48; }
+        .glass { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(12px); border: 1px solid #881337; }
+        
+        /* Анимированный Аватар Алины */
+        .alina-avatar {
+            width: 100px; height: 100px;
             border-radius: 50%;
-            box-shadow: 0 0 20px #e11d48;
-            animation: pulse 2s infinite;
+            background: radial-gradient(circle, #fb7185 0%, transparent 70%);
+            box-shadow: 0 0 30px #e11d48;
+            position: relative;
+            transition: all 0.3s ease;
         }
-        @keyframes pulse { 0%, 100% { opacity: 0.6; transform: scale(1); } 50% { opacity: 1; transform: scale(1.1); } }
+        .alina-avatar::after {
+            content: ''; position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border-radius: 50%; border: 2px solid #e11d48; opacity: 0.5;
+            animation: orb-pulse 2s infinite ease-in-out;
+        }
+        @keyframes orb-pulse { 0%, 100% { transform: scale(1); opacity: 0.3; } 50% { transform: scale(1.1); opacity: 0.6; } }
+        
+        /* Состояние "Алина думает" */
+        .alina-avatar.thinking { animation: thinking-glow 1s infinite alternate; }
+        @keyframes thinking-glow { 0% { box-shadow: 0 0 20px #e11d48; } 100% { box-shadow: 0 0 50px #fb7185, 0 0 70px #e11d48; } }
+
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #4c0519; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #881337; border-radius: 10px; }
     </style>
 </head>
 <body class="flex flex-col h-screen max-h-screen">
 
-    <header class="p-4 border-b border-rose-900 flex justify-between items-center glass">
-        <div class="neon-text font-bold tracking-tighter text-lg text-rose-500">ALINA_v1.0</div>
-        <div id="connection-status" class="text-[10px] text-rose-400 font-bold">● NEURAL_LINK_ACTIVE</div>
+    <header class="p-4 border-b border-rose-950 flex justify-between items-center glass z-10">
+        <div class="neon-text font-bold tracking-tighter text-xl text-rose-500">ALINA_OS</div>
+        <div id="status" class="text-[10px] text-rose-400 font-bold tracking-widest">SYSTEM ONLINE</div>
     </header>
 
-    <main id="chat-box" class="flex-1 overflow-y-auto p-4 space-y-4">
-        <div class="flex flex-col items-center my-10 text-center">
-            <div class="orb mb-4"></div>
-            <p class="text-[10px] text-rose-600 uppercase tracking-widest">Alina is ready for action...</p>
+    <main class="flex-1 overflow-hidden flex flex-col items-center justify-center p-4 relative">
+        
+        <div class="flex flex-col items-center my-6 z-10">
+            <div id="alina-face" class="alina-avatar mb-4"></div>
+            <p class="text-[11px] text-rose-600 uppercase tracking-widest neon-text">Alina Interface</p>
+        </div>
+
+        <div id="chat-box" class="w-full max-w-md flex-1 overflow-y-auto space-y-4 p-2 text-sm">
+            <div class="text-center text-rose-300 opacity-70">Скажи: "Привет, Алина" или напечатай запрос.</div>
         </div>
     </main>
 
-    <div id="net-panel" class="hidden p-3 mx-4 rounded-lg glass border-rose-500/30 text-[10px] mb-2">
-        <div class="text-rose-300">IP_ADDR: <span id="pub-ip" class="text-white">SCANNING...</span></div>
-        <div class="text-rose-300">LOCATION: <span id="region" class="text-white">...</span></div>
-    </div>
+    <footer class="p-4 glass border-t border-rose-950 z-10">
+        <div class="flex gap-2 items-center">
+            <button onclick="startVoiceInput()" id="mic-btn" class="p-3 border border-rose-800 rounded-full text-rose-400 hover:bg-rose-950 hover:border-rose-500 transition-all active:scale-95">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" />
+                </svg>
+            </button>
 
-    <footer class="p-4 glass border-t border-rose-900">
-        <div class="flex gap-2">
-            <button onclick="toggleNetPanel()" class="p-2 border border-rose-800 rounded-lg text-[10px] hover:bg-rose-950 text-rose-400">NET</button>
-            <input type="text" id="user-input" placeholder="Спроси Алину..." 
-                   class="flex-1 bg-black border border-rose-900 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-rose-400 text-rose-100">
-            <button onclick="askGemini()" class="bg-rose-600 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-rose-500">ASK</button>
+            <input type="text" id="user-input" placeholder="Команда для Алины..." 
+                   class="flex-1 bg-black border border-rose-900 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-rose-400 text-rose-100 placeholder:text-rose-800">
+            
+            <button onclick="askGemini()" class="bg-rose-600 text-white px-5 py-3 rounded-lg font-bold text-xs hover:bg-rose-500 transition-all active:scale-95">ASK</button>
         </div>
     </footer>
 
@@ -56,6 +75,9 @@
 
         const chatBox = document.getElementById('chat-box');
         const inputField = document.getElementById('user-input');
+        const alinaFace = document.getElementById('alina-face');
+        const statusText = document.getElementById('status');
+        const micBtn = document.getElementById('mic-btn');
 
         inputField.addEventListener("keypress", (e) => { if (e.key === "Enter") askGemini(); });
 
@@ -65,59 +87,11 @@
 
             appendMessage('YOU', msg);
             inputField.value = "";
-            
+            setAlinaStatus('thinking', 'THINKING...');
+
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        contents: [{ 
-                            parts: [{ 
-                                text: "Твое имя Алина. Ты — дерзкая, умная девушка, эксперт в 3D (Blender, UE5) и хакинге. Общайся на 'ты', будь краткой, саркастичной, но помогай по делу. Ответь на это: " + msg 
-                            }] 
-                        }] 
-                    })
-                });
-
-                const data = await response.json();
-                const aiText = data.candidates[0].content.parts[0].text;
-                appendMessage('ALINA', aiText);
-                
-                const speech = new SpeechSynthesisUtterance(aiText);
-                speech.lang = 'ru-RU';
-                speech.pitch = 1.2; // Чуть повыше голос
-                window.speechSynthesis.speak(speech);
-
-            } catch (error) {
-                appendMessage('SYSTEM', 'Ошибка доступа. Проверь API-ключ или сеть.');
-            }
-        }
-
-        function appendMessage(sender, text) {
-            const div = document.createElement('div');
-            div.className = sender === 'YOU' ? 'text-right' : 'text-left';
-            const color = sender === 'YOU' ? 'text-white' : 'text-rose-400';
-            div.innerHTML = `<span class="text-[10px] opacity-50 font-bold">${sender}</span><br><span class="${color}">${text}</span>`;
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function toggleNetPanel() {
-            const panel = document.getElementById('net-panel');
-            panel.classList.toggle('hidden');
-            if(!panel.classList.contains('hidden')) fetchNetInfo();
-        }
-
-        async function fetchNetInfo() {
-            try {
-                const res = await fetch('https://ipapi.co/json/');
-                const data = await res.json();
-                document.getElementById('pub-ip').innerText = data.ip;
-                document.getElementById('region').innerText = data.country_name;
-            } catch (e) {
-                document.getElementById('pub-ip').innerText = "ERROR";
-            }
-        }
-    </script>
-</body>
-</html>
+                        contents: [{ parts: [{ text: "Твое имя Алина. Ты — дерзкая, умная девушка-эксперт в 3D (Blender, UE5) и IT. Общайся на 'ты', будь краткой, са
