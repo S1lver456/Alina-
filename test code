@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ALINA OS | Ultimate Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <style id="dynamic-style">
+        :root { --bg: #050000; --text: #ff4d4d; --accent: #ff0000; --glass: rgba(20, 0, 0, 0.95); --border: #600; }
+        
+        body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono', monospace; overflow: hidden; height: 100vh; transition: 0.3s; }
+        .neon { color: var(--text); text-shadow: 0 0 10px var(--accent); }
+        .glass { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--border); }
+        
+        /* Лицо-Ядро */
+        .alina-core {
+            width: 120px; height: 120px;
+            border-radius: 50%; border: 2px solid var(--accent);
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 0 20px var(--border); position: relative; overflow: hidden;
+        }
+        .core-inner {
+            width: 60px; height: 60px;
+            background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+            border-radius: 50%; animation: pulse 1.5s infinite ease-in-out;
+        }
+        .alina-gif { width: 100%; height: 100%; object-fit: cover; display: none; }
+
+        @keyframes pulse { 0%, 100% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } }
+        .thinking .alina-core { border-color: #fff; box-shadow: 0 0 30px var(--text); }
+
+        #sidebar { transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 100; }
+        .panel { display: none; }
+        .panel-active { display: block; animation: fadeIn 0.3s forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+        
+        .menu-btn { width: 100%; padding: 18px; text-align: left; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: bold; letter-spacing: 1px; transition: 0.2s; display: flex; justify-content: space-between; align-items: center; }
+        .menu-btn:active { background: rgba(255,0,0,0.15); }
+        
+        #chat-box::-webkit-scrollbar { width: 3px; }
+        #chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <div id="sidebar" class="fixed top-0 right-0 w-80 h-full glass translate-x-full flex flex-col shadow-2xl">
+        <div class="p-5 border-b border-red-900 flex justify-between items-center">
+            <span id="menu-title" class="neon font-bold tracking-widest text-sm">SYSTEM MENU</span>
+            <button onclick="toggleMenu()" class="text-3xl text-red-500">&times;</button>
+        </div>
+
+        <div id="main-menu" class="panel panel-active">
+            <button onclick="switchPanel('params')" class="menu-btn uppercase">⚙️ Параметры <span>&rsaquo;</span></button>
+            <button onclick="switchPanel('vpn')" class="menu-btn uppercase">🛡 VPN Центр <span>&rsaquo;</span></button>
+            <div class="p-6 text-[9px] opacity-30 mt-auto uppercase">Build: 5.0.1-Hybrid</div>
+        </div>
+
+        <div id="params-menu" class="panel">
+            <button onclick="switchPanel('main')" class="menu-btn text-red-400">← НАЗАД</button>
+            
+            <div class="p-5 border-b border-red-900">
+                <p class="text-[9px] opacity-50 mb-4 uppercase tracking-tighter">Системная тема</p>
+                <button onclick="setTheme('red')" class="w-full py-3 mb-2 bg-red-950 border border-red-500 text-[10px] font-bold">OS RED (CORE)</button>
+                <button onclick="setTheme('cyber')" class="w-full py-3 bg-slate-950 border border-rose-600 text-[10px] text-rose-500 font-bold">CYBER ROSE (GIF)</button>
+            </div>
+
+            <div class="p-5 border-b border-red-900">
+                <p class="text-[9px] opacity-50 mb-4 uppercase tracking-tighter">Язык / Мова</p>
+                <div class="flex gap-2">
+                    <button onclick="setLang('ru')" class="flex-1 py-2 border border-red-900 text-[10px] hover:bg-red-900">RU</button>
+                    <button onclick="setLang('uk')" class="flex-1 py-2 border border-red-900 text-[10px] hover:bg-red-900">UA</button>
+                    <button onclick="setLang('en')" class="flex-1 py-2 border border-red-900 text-[10px] hover:bg-red-900">EN</button>
+                </div>
+            </div>
+
+            <button onclick="clearHistory()" class="menu-btn text-red-600">🗑 ОЧИСТИТЬ ПАМЯТЬ</button>
+        </div>
+
+        <div id="vpn-menu" class="panel">
+            <button onclick="switchPanel('main')" class="menu-btn text-red-400">← НАЗАД</button>
+            <div class="p-8 flex flex-col items-center text-center">
+                <div id="vpn-circle" class="w-20 h-20 border-4 border-red-900 rounded-full flex items-center justify-center mb-4 transition-all">
+                    <svg width="32" height="32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 2.18l7 3.12v4.7c0 4.67-3.13 8.94-7 10.11-3.87-1.17-7-5.44-7-10.11v-4.7l7-3.12z"/></svg>
+                </div>
+                <div id="vpn-ip-detail" class="text-xs font-bold mb-1">Detecting IP...</div>
+                <div id="vpn-status-text" class="text-[9px] uppercase opacity-50 mb-6">Status: Unprotected</div>
+                
+                <button onclick="toggleVPN()" id="vpn-toggle-btn" class="w-full py-4 bg-red-900/20 border-2 border-red-600 text-red-500 font-black text-xs tracking-widest rounded-xl hover:bg-red-600 hover:text-white transition-all">
+                    АКТИВИРОВАТЬ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <header class="p-4 border-b border-red-900 flex justify-between items-center glass">
+        <div class="neon font-bold tracking-widest text-lg" id="os-title">ALINA_v5.0</div>
+        <button onclick="toggleMenu()" class="p-2 active:scale-90 bg-red-950/30 rounded-lg">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+    </header>
+
+    <main id="main-ui" class="flex-1 overflow-hidden flex flex-col items-center justify-start pt-10 p-4 relative">
+        <div class="flex flex-col items-center mb-10">
+            <div class="alina-core" id="alina-face">
+                <div class="core-inner" id="core-anim"></div>
+                <img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3A0dzA1Z3BteWx4bnlhbnA1NmtyYzRyamt1ZXQzZzNxdWljY2pyMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oKIPnAiaMCws8nOKY/giphy.gif" class="alina-gif" id="core-gif">
+            </div>
+            <p id="sub-text" class="text-[10px] mt-4 tracking-[0.4em] opacity-60 neon uppercase text-center">Neural Interface Active</p>
+        </div>
+
+        <div id="chat-box" class="w-full max-w-md flex-1 overflow-y-auto space-y-4 p-2 text-sm border-t border-red-900/20 pt-4"></div>
+    </main>
+
+    <footer class="p-4 glass border-t border-red-900">
+        <div class="flex gap-2 items-center max-w-md mx-auto">
+            <button onclick="startVoiceInput()" id="mic-btn" class="p-3 border border-red-900 rounded-full text-red-500">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line></svg>
+            </button>
+            <input type="text" id="user-input" placeholder="Введите команду..." class="flex-1 bg-black border border-red-900 rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-red-500 text-red-100">
+            <button onclick="askGemini()" class="bg-red-800 text-white px-6 py-3 rounded-lg font-bold text-xs hover:bg-red-600 active:scale-95 transition-all">ASK</button>
+        </div>
+    </footer>
+
+    <script>
+        const API_KEY = "AIzaSyDE9xVebhRfr9sIUYKOpVrn0jg1JyOqnhk";
+        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
+
+        let currentLang = 'ru';
+        let vpnActive = false;
+
+        function toggleMenu() {
+            const side = document.getElementById('sidebar');
+            const isOpen = side.style.transform === 'translateX(0px)';
+            side.style.transform = isOpen ? 'translateX(100%)' : 'translateX(0px)';
+            if(isOpen) setTimeout(() => switchPanel('main'), 400);
+        }
+
+        function switchPanel(panel) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('panel-active'));
+            document.getElementById(panel + '-menu').classList.add('panel-active');
+            
+            const titles = { main: 'SYSTEM MENU', params: 'PARAMETERS', vpn: 'VPN CENTER' };
+            document.getElementById('menu-title').innerText = titles[panel];
+        }
+
+        function setTheme(type) {
+            const style = document.getElementById('dynamic-style');
+            const gif = document.getElementById('core-gif');
+            const anim = document.getElementById('core-anim');
+            
+            if(type === 'red') {
+                style.innerHTML = style.innerHTML.replace(/--bg: #010409; --text: #fb7185; --accent: #e11d48; --glass: rgba\(13, 17, 23, 0.95\); --border: #881337;/, "--bg: #050000; --text: #ff4d4d; --accent: #ff0000; --glass: rgba(20, 0, 0, 0.95); --border: #600;");
+                gif.style.display = 'none'; anim.style.display = 'block';
+            } else {
+                style.innerHTML = style.innerHTML.replace(/--bg: #050000; --text: #ff4d4d; --accent: #ff0000; --glass: rgba\(20, 0, 0, 0.95\); --border: #600;/, "--bg: #010409; --text: #fb7185; --accent: #e11d48; --glass: rgba(13, 17, 23, 0.95); --border: #881337;");
+                gif.style.display = 'block'; anim.style.display = 'none';
+            }
+            toggleMenu();
+        }
+
+        async function fetchIP() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                document.getElementById('vpn-ip-detail').innerText = data.ip;
+            } catch(e) { document.getElementById('vpn-ip-detail').innerText = "127.0.0.1 (Local)"; }
+        }
+
+        function toggleVPN() {
+            vpnActive = !vpnActive;
+            const btn = document.getElementById('vpn-toggle-btn');
+            const status = document.getElementById('vpn-status-text');
+            const circle = document.getElementById('vpn-circle');
+            const sub = document.getElementById('sub-text');
+
+            if(vpnActive) {
+                btn.innerText = "ДЕАКТИВИРОВАТЬ";
+                btn.className = "w-full py-4 bg-green-900/20 border-2 border-green-500 text-green-400 font-black text-xs tracking-widest rounded-xl transition-all";
+                status.innerText = "Status: Encrypted (Frankfurt)";
+                status.classList.add('text-green-500');
+                circle.classList.replace('border-red-900', 'border-green-500');
+                circle.classList.add('text-green-500', 'shadow-[0_0_20px_#22c55e]');
+                sub.innerText = "Encrypted Link Established";
+            } else {
+                btn.innerText = "АКТИВИРОВАТЬ";
+                btn.className = "w-full py-4 bg-red-900/20 border-2 border-red-600 text-red-500 font-black text-xs tracking-widest rounded-xl transition-all";
+                status.innerText = "Status: Unprotected";
+                status.classList.remove('text-green-500');
+                circle.classList.replace('border-green-500', 'border-red-900');
+                circle.classList.remove('text-green-500', 'shadow-[0_0_20px_#22c55e]');
+                sub.innerText = "Neural Interface Active";
+            }
+        }
+
+        function clearHistory() {
+            document.getElementById('chat-box').innerHTML = '<div class="text-center opacity-30 text-[10px]">MEMORY CLEARED</div>';
+            toggleMenu();
+        }
+
+        function setLang(l) { 
+            currentLang = l; 
+            const msg = { ru: 'Язык изменен', uk: 'Мову змінено', en: 'Language changed' };
+            appendMessage('SYSTEM', msg[l]);
+            toggleMenu(); 
+        }
+
+        async function askGemini() {
+            const input = document.getElementById('user-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            appendMessage('YOU', msg);
+            input.value = "";
+            document.getElementById('main-ui').classList.add('thinking');
+
+            try {
+                const prompt = `Ты Алина. Твой стиль: дерзкая, саркастичная, эксперт в IT. Отвечай на языке: ${currentLang}. Ответ должен быть коротким. Вопрос: ${msg}`;
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                const data = await response.json();
+                const aiText = data.candidates[0].content.parts[0].text;
+                appendMessage('ALINA', aiText);
+                speak(aiText);
+            } catch (e) { appendMessage('SYSTEM', 'Link error.'); }
+            document.getElementById('main-ui').classList.remove('thinking');
+        }
+
+        function appendMessage(sender, text) {
+            const div = document.createElement('div');
+            div.className = sender === 'YOU' ? 'text-right' : 'text-left';
+            const color = sender === 'ALINA' ? 'text-red-500' : (sender === 'SYSTEM' ? 'text-yellow-500' : 'text-white');
+            div.innerHTML = `<span class="text-[9px] font-bold opacity-30 uppercase">${sender}</span><br><span class="${color}">${text}</span>`;
+            const box = document.getElementById('chat-box');
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function speak(t) {
+            const s = new SpeechSynthesisUtterance(t);
+            s.lang = currentLang === 'uk' ? 'uk-UA' : (currentLang === 'en' ? 'en-US' : 'ru-RU');
+            s.pitch = 1.2;
+            window.speechSynthesis.speak(s);
+        }
+
+        function startVoiceInput() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechRecognition) return;
+            const rec = new SpeechRecognition();
+            rec.lang = currentLang === 'uk' ? 'uk-UA' : (currentLang === 'en' ? 'en-US' : 'ru-RU');
+            rec.onresult = (e) => { document.getElementById('user-input').value = e.results[0][0].transcript; askGemini(); };
+            rec.start();
+        }
+
+        window.onload = fetchIP;
+    </script>
+</body>
+</html>
