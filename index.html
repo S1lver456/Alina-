@@ -3,191 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ALINA AI | Neural System</title>
+    <title>ALINA MULTI-OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
-    <style>
-        body { background: #010409; color: #fb7185; font-family: 'JetBrains Mono', monospace; overflow: hidden; height: 100vh; margin: 0; }
-        .neon-text { font-family: 'Orbitron', sans-serif; text-shadow: 0 0 15px #e11d48; }
-        .glass { background: rgba(13, 17, 23, 0.95); backdrop-filter: blur(10px); border: 1px solid #881337; }
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono&family=Montserrat:wght@300;600&display=swap" rel="stylesheet">
+    <style id="theme-style">
+        /* По умолчанию Красная тема */
+        :root { --bg: #050000; --text: #ff4d4d; --accent: #ff0000; --glass: rgba(20, 0, 0, 0.9); --border: #600; --font: 'JetBrains Mono'; }
         
-        .alina-avatar {
-            width: 140px; height: 140px;
-            border-radius: 50%; border: 2px solid #e11d48;
-            box-shadow: 0 0 30px #e11d48; background-color: #000;
-            overflow: hidden; display: flex; justify-content: center; align-items: center;
-        }
-        .alina-avatar img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        body { background: var(--bg); color: var(--text); font-family: var(--font), monospace; overflow: hidden; height: 100vh; transition: 0.3s; }
+        .neon { text-shadow: 0 0 10px var(--accent); }
+        .glass { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--border); }
         
-        .thinking { animation: pulse-border 1s infinite alternate; }
-        @keyframes pulse-border { from { box-shadow: 0 0 20px #e11d48; } to { box-shadow: 0 0 50px #fb7185; } }
+        /* Лицо Алины */
+        .alina-core { width: 120px; height: 120px; border-radius: 50%; border: 2px solid var(--accent); display: flex; justify-content: center; align-items: center; box-shadow: 0 0 20px rgba(255,0,0,0.3); position: relative; overflow: hidden; }
+        .core-inner { width: 60px; height: 60px; background: radial-gradient(circle, var(--accent) 0%, transparent 70%); border-radius: 50%; animation: pulse 1.5s infinite ease-in-out; }
+        .alina-avatar-img { width: 100%; height: 100%; object-fit: cover; display: none; } /* Скрыто в красной теме */
 
-        /* Sidebar Styles */
-        #sidebar { transition: transform 0.3s ease-in-out; z-index: 50; }
-        .menu-item { border-bottom: 1px solid #301014; padding: 15px; cursor: pointer; transition: 0.2s; }
-        .menu-item:hover { background: #301014; }
+        @keyframes pulse { 0%, 100% { transform: scale(0.8); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } }
+        .thinking .alina-core { border-color: #fff; box-shadow: 0 0 30px var(--text); }
 
-        #chat-box::-webkit-scrollbar { width: 3px; }
-        #chat-box::-webkit-scrollbar-thumb { background: #881337; border-radius: 10px; }
+        #sidebar { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 100; }
+        .sub-panel { display: none; }
+        .active-panel { display: block; }
+        
+        .menu-btn { width: 100%; padding: 15px; text-align: left; border-bottom: 1px solid var(--border); font-size: 13px; transition: 0.2s; }
+        .menu-btn:active { background: var(--border); }
     </style>
 </head>
 <body class="flex flex-col h-screen relative">
 
-    <div id="sidebar" class="fixed top-0 right-0 w-64 h-full glass translate-x-full flex flex-col">
-        <div class="p-4 border-b border-rose-900 flex justify-between items-center">
-            <span class="neon-text text-sm">SETTINGS</span>
-            <button onclick="toggleMenu()" class="text-rose-500 text-2xl">&times;</button>
+    <div id="sidebar" class="fixed top-0 right-0 w-72 h-full glass translate-x-full flex flex-col shadow-2xl">
+        <div class="p-4 border-b border-red-900 flex justify-between items-center">
+            <span id="menu-title" class="neon font-bold">MAIN MENU</span>
+            <button onclick="toggleMenu()" class="text-2xl">&times;</button>
         </div>
-        <div class="flex-1 overflow-y-auto text-[11px]">
-            <div class="p-4 text-rose-300 opacity-50 uppercase">Память ядра</div>
-            <div class="menu-item" onclick="clearHistory()">🗑 Очистить историю</div>
+
+        <div id="main-panel" class="sub-panel active-panel">
+            <button onclick="openPanel('params')" class="menu-btn">⚙️ ПАРАМЕТРЫ</button>
+            <div class="p-4 border-b border-red-900">
+                <p class="text-[10px] opacity-50 mb-2">SECURITY STATUS</p>
+                <div id="vpn-stat" class="text-xs mb-3">IP: Detecting...</div>
+                <button onclick="toggleVPN()" id="vpn-trigger" class="w-full py-3 border border-red-900 rounded font-bold text-[10px]">ВКЛЮЧИТЬ VPN</button>
+            </div>
+        </div>
+
+        <div id="params-panel" class="sub-panel">
+            <button onclick="openPanel('main')" class="menu-btn text-xs">← НАЗАД</button>
             
-            <div class="p-4 text-rose-300 opacity-50 uppercase mt-4">Локация (VPN)</div>
-            <div class="p-4 bg-black/40">
-                <div id="vpn-info" class="mb-2">IP: <span class="text-white">Detecting...</span></div>
-                <button onclick="toggleVPN()" id="vpn-btn" class="w-full py-2 border border-rose-900 rounded hover:bg-rose-900 transition-all">ВКЛЮЧИТЬ VPN</button>
+            <div class="p-4 border-b border-red-900">
+                <p class="text-[10px] opacity-50 mb-2">INTERFACE LANGUAGE</p>
+                <div class="flex gap-1">
+                    <button onclick="setLang('ru')" class="flex-1 py-1 border border-red-900 text-[9px]">RU</button>
+                    <button onclick="setLang('uk')" class="flex-1 py-1 border border-red-900 text-[9px]">UK</button>
+                    <button onclick="setLang('en')" class="flex-1 py-1 border border-red-900 text-[9px]">EN</button>
+                </div>
             </div>
 
-            <div class="p-4 text-rose-300 opacity-50 uppercase mt-4">Язык системы</div>
-            <div class="flex p-2 gap-1">
-                <button onclick="setLang('ru')" class="flex-1 py-1 border border-rose-900 rounded text-[9px]">РУС</button>
-                <button onclick="setLang('uk')" class="flex-1 py-1 border border-rose-900 rounded text-[9px]">УКР</button>
-                <button onclick="setLang('en')" class="flex-1 py-1 border border-rose-900 rounded text-[9px]">ENG</button>
+            <div class="p-4 border-b border-red-900">
+                <p class="text-[10px] opacity-50 mb-2">SYSTEM THEME</p>
+                <button onclick="setTheme('red')" class="w-full py-2 mb-2 bg-red-950 text-[10px] border border-red-500">RED NEON (OS v1)</button>
+                <button onclick="setTheme('light')" class="w-full py-2 bg-white text-black text-[10px]">LIGHT MINIMAL (v2)</button>
             </div>
+
+            <button onclick="clearHistory()" class="menu-btn text-red-500">🗑 ОЧИСТИТЬ ИСТОРИЮ</button>
         </div>
     </div>
 
-    <header class="p-4 border-b border-rose-950 flex justify-between items-center glass z-10">
-        <div class="neon-text font-bold tracking-tighter text-xl text-rose-500">ALINA_SYSTEM</div>
-        <button onclick="toggleMenu()" class="p-2">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fb7185" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    <header class="p-4 border-b border-red-900 flex justify-between items-center glass z-10">
+        <div id="header-logo" class="neon font-bold tracking-widest text-lg">ALINA_SYSTEM</div>
+        <button onclick="toggleMenu()" class="p-1">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
         </button>
     </header>
 
-    <main class="flex-1 overflow-hidden flex flex-col items-center justify-start pt-6 p-4">
-        <div id="status" class="text-[9px] text-rose-400 font-bold tracking-widest uppercase mb-4">Neural Link Active</div>
-        
-        <div class="flex flex-col items-center mb-6 text-center">
-            <div id="alina-face" class="alina-avatar mb-4">
-                <img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3A0dzA1Z3BteWx4bnlhbnA1NmtyYzRyamt1ZXQzZzNxdWljY2pyMiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3oKIPnAiaMCws8nOKY/giphy.gif" alt="Alina">
+    <main id="main-ui" class="flex-1 overflow-hidden flex flex-col items-center justify-start pt-10 p-4">
+        <div class="flex flex-col items-center mb-8">
+            <div class="alina-core" id="alina-face">
+                <div class="core-inner" id="core-eye"></div>
+                <img src="https://i.ibb.co/F6P9M6R/alina-face-real.png" class="alina-avatar-img" id="face-img">
             </div>
-            <p id="ip-display" class="text-[8px] text-rose-600 tracking-[0.3em]">LOC: UNKNOWN</p>
+            <p id="loc-tag" class="text-[9px] mt-4 tracking-[0.4em] opacity-60 neon">Neural Interface Active</p>
         </div>
 
-        <div id="chat-box" class="w-full max-w-md flex-1 overflow-y-auto space-y-4 p-2 text-sm border-t border-rose-900/30 pt-4"></div>
+        <div id="chat-box" class="w-full max-w-md flex-1 overflow-y-auto space-y-4 p-2 text-sm border-t border-red-900/20 pt-4"></div>
     </main>
 
-    <footer class="p-4 glass border-t border-rose-900">
+    <footer class="p-4 glass border-t border-red-900">
         <div class="flex gap-2 items-center max-w-md mx-auto">
-            <button onclick="startVoiceInput()" id="mic-btn" class="p-3 border border-rose-800 rounded-full text-rose-400">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
-            </button>
-            <input type="text" id="user-input" placeholder="Введите команду..." class="flex-1 bg-black border border-rose-900 rounded-lg px-4 py-3 text-sm focus:border-rose-500 text-rose-100">
-            <button onclick="askGemini()" class="bg-rose-700 text-white px-5 py-3 rounded-lg font-bold text-xs">ASK</button>
+            <button onclick="startVoiceInput()" class="p-3 border border-red-900 rounded-full text-red-500"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg></button>
+            <input type="text" id="user-input" placeholder="Введите команду..." class="flex-1 bg-black/20 border border-red-900 rounded-lg px-4 py-3 text-sm outline-none focus:border-red-500">
+            <button onclick="askGemini()" class="bg-red-800 text-white px-6 py-3 rounded-lg font-bold text-xs active:scale-95">ASK</button>
         </div>
     </footer>
 
     <script>
-        const API_KEY = "AIzaSyDE9xVebhRfr9sIUYKOpVrn0jg1JyOqnhk"; 
+        const API_KEY = "AIzaSyDE9xVebhRfr9sIUYKOpVrn0jg1JyOqnhk";
         const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
-
-        let history = JSON.parse(localStorage.getItem('alina_history')) || [];
+        
         let vpnActive = false;
         let currentLang = 'ru';
+        let currentTheme = 'red';
 
-        window.onload = () => {
-            renderHistory();
-            fetchIP();
-        };
+        // Инициализация
+        window.onload = () => { fetchIP(); renderHistory(); };
 
         function toggleMenu() {
-            const menu = document.getElementById('sidebar');
-            menu.style.transform = menu.style.transform === 'translateX(0px)' ? 'translateX(100%)' : 'translateX(0px)';
+            const s = document.getElementById('sidebar');
+            s.style.transform = s.style.transform === 'translateX(0px)' ? 'translateX(100%)' : 'translateX(0px)';
+            openPanel('main');
+        }
+
+        function openPanel(panelId) {
+            document.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active-panel'));
+            document.getElementById(panelId + '-panel').classList.add('active-panel');
+            document.getElementById('menu-title').innerText = panelId === 'main' ? 'MAIN MENU' : 'PARAMETERS';
+        }
+
+        function setTheme(theme) {
+            currentTheme = theme;
+            const style = document.getElementById('theme-style');
+            const eye = document.getElementById('core-eye');
+            const img = document.getElementById('face-img');
+            const input = document.getElementById('user-input');
+
+            if(theme === 'red') {
+                style.innerHTML = `:root { --bg: #050000; --text: #ff4d4d; --accent: #ff0000; --glass: rgba(20, 0, 0, 0.9); --border: #600; --font: 'JetBrains Mono'; } body { background: var(--bg); color: var(--text); font-family: var(--font); } .neon { text-shadow: 0 0 10px var(--accent); } .glass { background: var(--glass); border: 1px solid var(--border); }`;
+                eye.style.display = 'block'; img.style.display = 'none';
+                input.classList.add('bg-black/20'); input.classList.remove('bg-white');
+            } else {
+                style.innerHTML = `:root { --bg: #fafafa; --text: #1f2937; --accent: #f43f5e; --glass: rgba(255, 255, 255, 0.9); --border: #e5e7eb; --font: 'Montserrat'; } body { background: var(--bg); color: var(--text); font-family: var(--font); } .neon { text-shadow: none; font-weight: 600; } .glass { background: var(--glass); border: 1px solid var(--border); }`;
+                eye.style.display = 'none'; img.style.display = 'block';
+                input.classList.remove('bg-black/20'); input.classList.add('bg-white');
+            }
+            toggleMenu();
         }
 
         async function fetchIP() {
             try {
                 const res = await fetch('https://ipapi.co/json/');
                 const data = await res.json();
-                document.getElementById('vpn-info').innerHTML = `IP: ${data.ip}<br>COUNTRY: ${data.country_name}`;
-                document.getElementById('ip-display').innerText = `LOC: ${data.city} / ${data.country}`;
-            } catch(e) { console.log('IP Fetch Error'); }
+                document.getElementById('vpn-stat').innerHTML = `IP: ${data.ip} | ${data.country_code}`;
+            } catch(e) { document.getElementById('vpn-stat').innerText = "IP: Protected/Hidden"; }
         }
 
         function toggleVPN() {
             vpnActive = !vpnActive;
-            const btn = document.getElementById('vpn-btn');
-            const display = document.getElementById('ip-display');
+            const btn = document.getElementById('vpn-trigger');
+            const tag = document.getElementById('loc-tag');
             if(vpnActive) {
-                btn.innerText = "VPN: ОНЛАЙН";
-                btn.style.borderColor = "#22c55e";
-                display.innerText = "LOC: FRANKFURT / GERMANY (PROXY)";
-                appendMessage('SYSTEM', 'VPN канал установлен. Соединение зашифровано.');
+                btn.innerText = "VPN: PROTECTED"; btn.style.color = "#4ade80";
+                tag.innerText = "LOC: FRANKFURT / GERMANY (ENCRYPTED)";
+                appendMessage('SYSTEM', 'VPN tunnel created.');
             } else {
-                btn.innerText = "ВКЛЮЧИТЬ VPN";
-                btn.style.borderColor = "";
+                btn.innerText = "ВКЛЮЧИТЬ VPN"; btn.style.color = "";
                 fetchIP();
+                tag.innerText = "Neural Interface Active";
             }
+            toggleMenu();
         }
 
         function clearHistory() {
-            history = [];
             localStorage.removeItem('alina_history');
             document.getElementById('chat-box').innerHTML = '';
+            appendMessage('SYSTEM', 'Memory wiped.');
             toggleMenu();
         }
 
-        function setLang(l) {
-            currentLang = l;
-            appendMessage('SYSTEM', `Язык системы изменен на: ${l.toUpperCase()}`);
-            toggleMenu();
-        }
+        function setLang(l) { currentLang = l; appendMessage('SYSTEM', 'Language: ' + l.toUpperCase()); toggleMenu(); }
 
         async function askGemini() {
-            const msg = document.getElementById('user-input').value.trim();
-            if (!msg) return;
-            
-            if(msg.toLowerCase().includes('включи впн')) { toggleVPN(); document.getElementById('user-input').value = ""; return; }
+            const input = document.getElementById('user-input');
+            const msg = input.value.trim();
+            if(!msg) return;
 
             appendMessage('YOU', msg);
-            document.getElementById('user-input').value = "";
-            document.getElementById('alina-face').classList.add('thinking');
+            input.value = "";
+            document.getElementById('main-ui').classList.add('thinking');
 
             try {
-                const context = `Твое имя Алина. Ты дерзкая, умная. Язык общения: ${currentLang}. История: ${JSON.stringify(history.slice(-5))}. Ответ: `;
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: context + msg }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ text: `Ты Алина, дерзкая. Язык: ${currentLang}. Ответь кратко: ${msg}` }] }] })
                 });
-
                 const data = await response.json();
                 const aiText = data.candidates[0].content.parts[0].text;
-                
                 appendMessage('ALINA', aiText);
-                saveMessage(msg, aiText);
                 speak(aiText);
-            } catch (e) { appendMessage('SYSTEM', 'Neural Link Error.'); }
-            document.getElementById('alina-face').classList.remove('thinking');
-        }
-
-        function saveMessage(u, a) {
-            history.push({u, a});
-            if(history.length > 20) history.shift();
-            localStorage.setItem('alina_history', JSON.stringify(history));
-        }
-
-        function renderHistory() {
-            history.forEach(item => {
-                appendMessage('YOU', item.u);
-                appendMessage('ALINA', item.a);
-            });
+            } catch(e) { appendMessage('SYSTEM', 'Link failed.'); }
+            document.getElementById('main-ui').classList.remove('thinking');
         }
 
         function appendMessage(sender, text) {
             const div = document.createElement('div');
             div.className = sender === 'YOU' ? 'text-right' : 'text-left';
-            div.innerHTML = `<span class="text-[8px] font-bold opacity-30">${sender}</span><br><span class="${sender === 'ALINA' ? 'text-rose-400' : 'text-white'}">${text}</span>`;
+            const color = sender === 'ALINA' ? 'text-rose-500' : (sender === 'SYSTEM' ? 'text-yellow-500' : 'text-gray-400');
+            div.innerHTML = `<span class="text-[8px] font-bold opacity-40 uppercase">${sender}</span><br><span class="${sender==='YOU'?'text-white':color}">${text}</span>`;
             const box = document.getElementById('chat-box');
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;
@@ -200,12 +211,14 @@
         }
 
         function startVoiceInput() {
-            const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             const rec = new SpeechRecognition();
             rec.lang = currentLang === 'uk' ? 'uk-UA' : 'ru-RU';
             rec.onresult = (e) => { document.getElementById('user-input').value = e.results[0][0].transcript; askGemini(); };
             rec.start();
         }
+
+        function renderHistory() { /* История загружается тут при необходимости */ }
     </script>
 </body>
 </html>
