@@ -124,18 +124,12 @@
 
     <script>
 
-    let API_KEY = localStorage.getItem('ALINA_CORE_KEY');
-    const USER_NAME = localStorage.getItem('ALINA_USER_NAME') || 'Пользователь';
+        let API_KEY = sessionStorage.getItem('ALINA_SESSION_KEY'); 
 
-// Если ключа нет — немедленно отправляем на страницу активации
     if (!API_KEY) {
         window.location.href = 'reg.html';
     }
 
-// УДАЛЯЕМ ключ из памяти СРАЗУ. 
-// Теперь он хранится только в этой переменной до закрытия страницы.
-    localStorage.removeItem('ALINA_CORE_KEY');
-        
         const MODEL = "gemini-2.5-flash"; // Самая стабильная на сегодня
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
         
