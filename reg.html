@@ -24,8 +24,8 @@
         <div class="status">IDENTIFICATION REQUIRED</div>
         
         <form id="loginForm" onsubmit="activate(event)">
-            <input type="text" id="username" name="username" placeholder="USER NAME" required autocomplete="username">
-            <input type="password" id="keyInput" name="password" placeholder="ENTER API KEY..." required autocomplete="current-password">
+            <input type="text" id="username" name="username" placeholder="USER NAME" required>
+            <input type="password" id="keyInput" name="password" placeholder="ENTER API KEY..." required>
             <button type="submit">Connect to Alina</button>
         </form>
 
@@ -39,24 +39,21 @@
 
     <script>
         function activate(event) {
-            event.preventDefault(); 
+            event.preventDefault(); // Чтобы страница не перезагружалась сразу
             
             const user = document.getElementById('username').value.trim();
             const key = document.getElementById('keyInput').value.trim();
             
             if (key.startsWith('AIza')) {
-                // Сохраняем данные (используем localStorage для надежности)
+                // Сохраняем и имя, и ключ
                 localStorage.setItem('ALINA_USER_NAME', user);
                 localStorage.setItem('ALINA_CORE_KEY', key);
                 
                 document.getElementById('msg').innerText = 'ACCESS GRANTED. WELCOME, ' + user.toUpperCase();
                 
-                // Сразу активируем голос (пинок)
-                const wakeup = new SpeechSynthesisUtterance('');
-                window.speechSynthesis.speak(wakeup);
-                
-                // Мгновенный переход без длинных пауз
-                window.location.href = 'index.html';
+                setTimeout(() => { 
+                    window.location.href = 'index.html'; 
+                }, 1500);
             } else {
                 alert('ERROR: INVALID KEY STRUCTURE. KEY MUST START WITH "AIza"');
             }
