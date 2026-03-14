@@ -5,3 +5,5 @@ https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash?key= т
 Все сылки вставлять в браузер.
 ссылка для получения ключа 
 https://aistudio.google.com/prompts/new_chat
+Для запуска програмы на пк используйте команду: npm start
+если не сработало код для установки компочей npm install electron --save-dev
