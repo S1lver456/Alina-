@@ -39,23 +39,31 @@
 
     <script>
         function activate(event) {
-            event.preventDefault(); // Чтобы страница не перезагружалась сразу
+            event.preventDefault();
             
+            // Чистим вводы от случайных пробелов
             const user = document.getElementById('username').value.trim();
             const key = document.getElementById('keyInput').value.trim();
             
             if (key.startsWith('AIza')) {
-                // Сохраняем и имя, и ключ
+                // Принудительно чистим старую память перед записью
+                localStorage.clear();
+
+                // Сохраняем свежие данные
                 localStorage.setItem('ALINA_USER_NAME', user);
                 localStorage.setItem('ALINA_CORE_KEY', key);
+                
+                // ХАК ДЛЯ ТЕЛЕФОНА: Разрешаем звук по клику
+                const wakeup = new SpeechSynthesisUtterance('');
+                window.speechSynthesis.speak(wakeup);
                 
                 document.getElementById('msg').innerText = 'ACCESS GRANTED. WELCOME, ' + user.toUpperCase();
                 
                 setTimeout(() => { 
                     window.location.href = 'index.html'; 
-                }, 1500);
+                }, 1000);
             } else {
-                alert('ERROR: INVALID KEY STRUCTURE. KEY MUST START WITH "AIza"');
+                alert('ERROR: INVALID KEY STRUCTURE. MUST START WITH "AIza"');
             }
         }
     </script>
