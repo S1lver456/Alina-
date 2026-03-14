@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALINA — Активация</title>
+    <style>
+        body { background: #0a0a0a; color: #ff3333; font-family: 'Courier New', Courier, monospace; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        .box { background: #1a1a1a; border: 2px solid #ff3333; padding: 30px; border-radius: 5px; box-shadow: 0 0 20px rgba(255, 51, 51, 0.2); text-align: center; width: 320px; }
+        h1 { font-size: 1.5rem; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; }
+        input { width: 100%; padding: 12px; margin: 20px 0; border: 1px solid #ff3333; background: #000; color: #fff; font-family: monospace; outline: none; box-sizing: border-box; }
+        input:focus { box-shadow: 0 0 10px #ff3333; }
+        button { background: #ff3333; color: #000; border: none; padding: 12px; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; transition: 0.3s; }
+        button:hover { background: #fff; box-shadow: 0 0 20px #fff; }
+        .status { font-size: 0.7rem; color: #666; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>System Activation</h1>
+        <div class="status">NEURAL LINK REQUIRED</div>
+        <input type="password" id="keyInput" placeholder="ENTER API KEY...">
+        <button onclick="activate()">Connect to Alina</button>
+        <div class="status" id="msg">WAITING FOR INPUT...</div>
+    </div>
+
+    <script>
+        function activate() {
+            const key = document.getElementById('keyInput').value.trim();
+            if (key.startsWith('AIza')) {
+                localStorage.setItem('ALINA_CORE_KEY', key);
+                document.getElementById('msg').innerText = 'CORE ACTIVATED. REDIRECTING...';
+                setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+            } else {
+                alert('ERROR: INVALID KEY STRUCTURE');
+            }
+        }
+    </script>
+</body>
+</html>
