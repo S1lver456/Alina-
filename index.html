@@ -123,18 +123,14 @@
     </footer>
 
     <script>
-// Забираем ключ
-let API_KEY = localStorage.getItem('ALINA_CORE_KEY');
+ let API_KEY = localStorage.getItem('ALINA_CORE_KEY');
+
 
 if (!API_KEY) {
     window.location.href = 'reg.html';
 }
-
-// 1. Ставим модель СТРОГО как на твоем скриншоте
-const MODEL = "gemini-2.5-flash"; 
-
-// 2. ВАЖНО: Используем v1beta, так как 2.5 — это экспериментальная ветка
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+        const MODEL = "gemini-2.5-flash"; // Самая стабильная на сегодня
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
         
         let currentLang = 'ru';
         let vpnActive = false;
