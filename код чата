@@ -1,0 +1,6 @@
+const API_KEY = localStorage.getItem('ALINA_CORE_KEY');
+const userName = localStorage.getItem('ALINA_USER_NAME') || 'Пользователь';
+
+
+const MODEL = "gemini-2.5-flash"; 
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
