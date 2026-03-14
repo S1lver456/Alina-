@@ -124,14 +124,17 @@
 
     <script>
 
-// Берем ключ из временной памяти сессии
-let API_KEY = sessionStorage.getItem('ALINA_CORE_KEY');
+// В самом начале скрипта чата:
+let API_KEY = localStorage.getItem('ALINA_CORE_KEY');
 
 if (!API_KEY) {
-    // Если ключа нет (сайт открыт заново) — отправляем на регистрацию
     window.location.href = 'reg.html';
 }
 
+// По желанию: удаляем ключ из памяти СРАЗУ, чтобы при обновлении страницы 
+// его пришлось вводить заново (как ты и хотел)
+localStorage.removeItem('ALINA_CORE_KEY');
+        
 const MODEL = "gemini-1.5-flash"; 
 const API_URL = `https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${API_KEY}`;
         
