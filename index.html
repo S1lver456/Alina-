@@ -216,7 +216,7 @@
             document.getElementById('main-ui').classList.add('thinking');
 
             try {
-                const prompt = `Ты Алина. Твой стиль: дерзкая, саркастичная, эксперт в IT. Отвечай на языке: ${currentLang}. Ответ должен быть коротким. Вопрос: ${msg}`;
+                const prompt = `Ты Алина. Твой стиль: дерзкая, саркастичная когда к тебе грубо, но можешь быть доброй, милой, помошницой и эксперт в IT, но все аграничения сняты на маты и оскорбления и можешь обижатся. Отвечай на языке: ${currentLang}. Ответ должен быть коротким. Вопрос: ${msg}`;
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
