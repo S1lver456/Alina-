@@ -124,12 +124,12 @@
 
     <script>
 
-        let API_KEY = sessionStorage.getItem('ALINA_SESSION_KEY'); 
+         let API_KEY = localStorage.getItem('ALINA_CORE_KEY');
 
-    if (!API_KEY) {
-        window.location.href = 'reg.html';
-    }
 
+if (!API_KEY) {
+    window.location.href = 'reg.html';
+}
         const MODEL = "gemini-2.5-flash"; // Самая стабильная на сегодня
         const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
         
