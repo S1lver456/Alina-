@@ -1,0 +1,5 @@
+1. Проверить модель AI для работы асистента: 
+https://generativelanguage.googleapis.com/v1beta/models?key=твой ключ от AI
+2. ссылка для проверки АИ:
+https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash?key= твой ключ от AI
+Все сылки вставлять в браузер.
