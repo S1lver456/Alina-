@@ -53,6 +53,7 @@
         <div id="main-menu" class="panel panel-active">
             <button onclick="switchPanel('params')" class="menu-btn uppercase">⚙️ Параметры <span>&rsaquo;</span></button>
             <button onclick="switchPanel('vpn')" class="menu-btn uppercase">🛡 VPN Центр <span>&rsaquo;</span></button>
+            <button onclick="logoutSystem()" class="menu-btn text-red-500 font-bold">🔓 СМЕНИТЬ КЛЮЧ / ВЫХОД</button>
             <div class="p-6 text-[9px] opacity-30 mt-auto uppercase">Build: 5.0.1-Hybrid</div>
         </div>
 
@@ -123,6 +124,11 @@
     </footer>
 
     <script>
+        function logoutSystem() {
+    localStorage.removeItem('ALINA_CORE_KEY'); // Удаляем только ключ
+    window.location.href = 'reg.html';        // Выкидываем на регистрацию
+}
+        
  let API_KEY = localStorage.getItem('ALINA_CORE_KEY');
 
 
