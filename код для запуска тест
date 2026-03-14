@@ -1,1 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALINA — Активация</title>
+    <style>
+        body { background: #0a0a0a; color: #ff3333; font-family: 'Courier New', Courier, monospace; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        .box { background: #1a1a1a; border: 2px solid #ff3333; padding: 30px; border-radius: 5px; box-shadow: 0 0 20px rgba(255, 51, 51, 0.2); text-align: center; width: 320px; }
+        h1 { font-size: 1.5rem; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ff3333; background: #000; color: #fff; font-family: monospace; outline: none; box-sizing: border-box; }
+        input:focus { box-shadow: 0 0 10px #ff3333; }
+        button { background: #ff3333; color: #000; border: none; padding: 12px; cursor: pointer; width: 100%; font-weight: bold; text-transform: uppercase; transition: 0.3s; margin-top: 10px; }
+        button:hover { background: #fff; box-shadow: 0 0 20px #fff; }
+        .status { font-size: 0.7rem; color: #666; margin-top: 15px; }
+        .link-box { margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; }
+        .get-key-btn { font-size: 0.7rem; color: #ff3333; text-decoration: none; border: 1px solid #444; padding: 5px 10px; display: inline-block; transition: 0.3s; }
+        .get-key-btn:hover { border-color: #ff3333; background: rgba(255,51,51,0.1); }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>System Activation</h1>
+        <div class="status">IDENTIFICATION REQUIRED</div>
+        
+        <form id="loginForm" onsubmit="activate(event)">
+            <input type="text" id="username" name="username" placeholder="USER NAME" required>
+            <input type="password" id="keyInput" name="password" placeholder="ENTER API KEY..." required>
+            <button type="submit">Connect to Alina</button>
+        </form>
 
+        <div class="status" id="msg">WAITING FOR AUTH...</div>
+
+        <div class="link-box">
+            <div style="font-size: 0.6rem; margin-bottom: 8px; color: #555;">NO ACCESS KEY?</div>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" class="get-key-btn">GET KEY FROM GOOGLE AI</a>
+        </div>
+    </div>
+
+    <script>
+        function activate(event) {
+            event.preventDefault(); // Чтобы страница не перезагружалась сразу
+            
+            const user = document.getElementById('username').value.trim();
+            const key = document.getElementById('keyInput').value.trim();
+            
+            if (key.startsWith('AIza')) {
+                // Сохраняем и имя, и ключ
+                localStorage.setItem('ALINA_USER_NAME', user);
+                localStorage.setItem('ALINA_CORE_KEY', key);
+                
+                document.getElementById('msg').innerText = 'ACCESS GRANTED. WELCOME, ' + user.toUpperCase();
+                
+                setTimeout(() => { 
+                    window.location.href = 'index.html'; 
+                }, 1500);
+            } else {
+                alert('ERROR: INVALID KEY STRUCTURE. KEY MUST START WITH "AIza"');
+            }
+        }
+    </script>
+</body>
+</html>
