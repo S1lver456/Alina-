@@ -1,8 +1,4 @@
-
-[[plugins]]
- package = "@netlify/plugin-emails" # Это заглушка, чтобы Netlify обновил зависимости
-
 [[plugins]]
   package = "netlify-plugin-replace"
-    [plugins.inputs]
-      "SECRET_API_KEY" = "AIzaSyDaYJADxo8fC4LYP5CEE_alU7KzYTMyavs"
+  [plugins.inputs]
+    "SECRET_API_KEY" = "AIzaSyDaYJADxo8fC4LYP5CEE_alU7KzYTMyavs"
