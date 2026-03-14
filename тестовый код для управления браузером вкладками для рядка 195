@@ -1,0 +1,46 @@
+async function askGemini() {
+            const input = document.getElementById('user-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            appendMessage('YOU', msg);
+            input.value = "";
+            document.getElementById('main-ui').classList.add('thinking');
+
+            try {
+                // Добавляем инструкцию для Алины, чтобы она знала, как открывать ссылки
+                const prompt = `Ты Алина. Твой стиль: дерзкая, саркастичная когда к тебе грубо, но можешь быть доброй, милой помощницей и эксперт в IT. Ограничения на маты сняты. 
+                ЕСЛИ пользователь просит открыть сайт или найти что-то, в конце ответа ОБЯЗАТЕЛЬНО добавь скрытую команду в формате: [URL:https://адрес].
+                Отвечай на языке: ${currentLang}. Ответ должен быть коротким. Вопрос: ${msg}`;
+
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+
+                const data = await response.json();
+                let aiText = data.candidates[0].content.parts[0].text;
+
+                // ЛОГИКА ОТКРЫТИЯ ВКЛАДКИ
+                const urlMatch = aiText.match(/\[URL:(https?:\/\/[^\s\]]+)\]/);
+                if (urlMatch) {
+                    const targetUrl = urlMatch[1];
+                    // Убираем техническую команду из текста, который увидит пользователь
+                    aiText = aiText.replace(/\[URL:.*?\]/g, "");
+                    appendMessage('SYSTEM', `Opening: ${targetUrl}`);
+                    
+                    // Открываем вкладку
+                    setTimeout(() => {
+                        window.open(targetUrl, '_blank');
+                    }, 1000);
+                }
+
+                appendMessage('ALINA', aiText);
+                speak(aiText);
+            } catch (e) { 
+                appendMessage('SYSTEM', 'Link error. Проверь VPN или Ключ.'); 
+                console.error(e);
+            }
+            document.getElementById('main-ui').classList.remove('thinking');
+        }
