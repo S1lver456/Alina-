@@ -123,8 +123,9 @@
     </footer>
 
     <script>
-        const API_KEY = "AIzaSyDE9xVebhRfr9sIUYKOpVrn0jg1JyOqnhk";
-        const API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + API_KEY;
+        const API_KEY = "AIzaSyDWVLiCaH5_1ZT65Hw3tPYs--NcaoriEwA";
+        const MODEL = "gemini-2.5-flash";
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
 
         let currentLang = 'ru';
         let vpnActive = false;
