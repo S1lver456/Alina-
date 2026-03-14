@@ -123,22 +123,19 @@
     </footer>
 
     <script>
-
-// В самом начале скрипта чата:
+// Забираем ключ
 let API_KEY = localStorage.getItem('ALINA_CORE_KEY');
 
 if (!API_KEY) {
     window.location.href = 'reg.html';
 }
 
-// По желанию: удаляем ключ из памяти СРАЗУ, чтобы при обновлении страницы 
-// его пришлось вводить заново (как ты и хотел)
-localStorage.removeItem('ALINA_CORE_KEY');
-        
+// 1. Ставим модель СТРОГО как на твоем скриншоте
 const MODEL = "gemini-2.5-flash"; 
-const API_URL = `https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${API_KEY}`;
-        
 
+// 2. ВАЖНО: Используем v1beta, так как 2.5 — это экспериментальная ветка
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+        
         let currentLang = 'ru';
         let vpnActive = false;
 
