@@ -1,3 +1,5 @@
+
+[[plugins]]
  package = "@netlify/plugin-emails" # Это заглушка, чтобы Netlify обновил зависимости
 
 [[plugins]]
