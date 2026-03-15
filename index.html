@@ -123,151 +123,179 @@
         </div>
     </footer>
 
-    <script>
-        function logoutSystem() {
-    localStorage.removeItem('ALINA_CORE_KEY'); // Удаляем только ключ
-    window.location.href = 'reg.html';        // Выкидываем на регистрацию
-}
+<script>
+    function logoutSystem() {
+        localStorage.removeItem('ALINA_CORE_KEY'); 
+        window.location.href = 'reg.html';        
+    }
         
- let API_KEY = localStorage.getItem('ALINA_CORE_KEY');
+    let API_KEY = localStorage.getItem('ALINA_CORE_KEY');
 
+    if (!API_KEY) {
+        window.location.href = 'reg.html';
+    }
 
-if (!API_KEY) {
-    window.location.href = 'reg.html';
-}
-        const MODEL = "gemini-2.5-flash"; // Самая стабильная на сегодня
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
+    const MODEL = "gemini-2.5-flash"; 
+    // Если сделаешь воркер Cloudflare, замени ссылку ниже на адрес воркера
+    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
         
-        let currentLang = 'ru';
-        let vpnActive = false;
+    let currentLang = 'ru';
+    let vpnActive = false;
+    let chatHistory = []; // Память Алины
 
-        function toggleMenu() {
-            const side = document.getElementById('sidebar');
-            const isOpen = side.style.transform === 'translateX(0px)';
-            side.style.transform = isOpen ? 'translateX(100%)' : 'translateX(0px)';
-            if(isOpen) setTimeout(() => switchPanel('main'), 400);
+    function toggleMenu() {
+        const side = document.getElementById('sidebar');
+        const isOpen = side.style.transform === 'translateX(0px)';
+        side.style.transform = isOpen ? 'translateX(100%)' : 'translateX(0px)';
+        if(isOpen) setTimeout(() => switchPanel('main'), 400);
+    }
+
+    function switchPanel(panel) {
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('panel-active'));
+        document.getElementById(panel + '-menu').classList.add('panel-active');
+        const titles = { main: 'SYSTEM MENU', params: 'PARAMETERS', vpn: 'VPN CENTER' };
+        document.getElementById('menu-title').innerText = titles[panel];
+    }
+
+    function setTheme(type) {
+        const style = document.getElementById('dynamic-style');
+        const gif = document.getElementById('core-gif');
+        const anim = document.getElementById('core-anim');
+        
+        if(type === 'red') {
+            style.innerHTML = style.innerHTML.replace(/--bg: #010409; --text: #fb7185; --accent: #e11d48; --glass: rgba\(13, 17, 23, 0.95\); --border: #881337;/, "--bg: #050000; --text: #ff4d4d; --accent: #ff0000; --glass: rgba(20, 0, 0, 0.95); --border: #600;");
+            gif.style.display = 'none'; anim.style.display = 'block';
+        } else {
+            style.innerHTML = style.innerHTML.replace(/--bg: #050000; --text: #ff4d4d; --accent: #ff0000; --glass: rgba\(20, 0, 0, 0.95\); --border: #600;/, "--bg: #010409; --text: #fb7185; --accent: #e11d48; --glass: rgba(13, 17, 23, 0.95); --border: #881337;");
+            gif.style.display = 'block'; anim.style.display = 'none';
         }
+        toggleMenu();
+    }
 
-        function switchPanel(panel) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('panel-active'));
-            document.getElementById(panel + '-menu').classList.add('panel-active');
+    async function fetchIP() {
+        try {
+            const res = await fetch('https://ipapi.co/json/');
+            const data = await res.json();
+            document.getElementById('vpn-ip-detail').innerText = data.ip;
+        } catch(e) { document.getElementById('vpn-ip-detail').innerText = "127.0.0.1 (Local)"; }
+    }
+
+    function toggleVPN() {
+        vpnActive = !vpnActive;
+        const btn = document.getElementById('vpn-toggle-btn');
+        const status = document.getElementById('vpn-status-text');
+        const circle = document.getElementById('vpn-circle');
+        const sub = document.getElementById('sub-text');
+
+        if(vpnActive) {
+            btn.innerText = "ДЕАКТИВИРОВАТЬ";
+            btn.className = "w-full py-4 bg-green-900/20 border-2 border-green-500 text-green-400 font-black text-xs tracking-widest rounded-xl transition-all";
+            status.innerText = "Status: Encrypted (Frankfurt)";
+            status.classList.add('text-green-500');
+            circle.classList.replace('border-red-900', 'border-green-500');
+            circle.classList.add('text-green-500', 'shadow-[0_0_20px_#22c55e]');
+            sub.innerText = "Encrypted Link Established";
+        } else {
+            btn.innerText = "АКТИВИРОВАТЬ";
+            btn.className = "w-full py-4 bg-red-900/20 border-2 border-red-600 text-red-500 font-black text-xs tracking-widest rounded-xl transition-all";
+            status.innerText = "Status: Unprotected";
+            status.classList.remove('text-green-500');
+            circle.classList.replace('border-green-500', 'border-red-900');
+            circle.classList.remove('text-green-500', 'shadow-[0_0_20px_#22c55e]');
+            sub.innerText = "Neural Interface Active";
+        }
+    }
+
+    function clearHistory() {
+        chatHistory = []; // Очищаем массив памяти
+        document.getElementById('chat-box').innerHTML = '<div class="text-center opacity-30 text-[10px]">MEMORY CLEARED</div>';
+        toggleMenu();
+    }
+
+    function setLang(l) { 
+        currentLang = l; 
+        const msg = { ru: 'Язык изменен', uk: 'Мову змінено', en: 'Language changed' };
+        appendMessage('SYSTEM', msg[l]);
+        toggleMenu(); 
+    }
+
+    async function askGemini() {
+        const input = document.getElementById('user-input');
+        const msg = input.value.trim();
+        if (!msg) return;
+
+        appendMessage('YOU', msg);
+        input.value = "";
+        document.getElementById('main-ui').classList.add('thinking');
+
+        chatHistory.push({ role: "user", parts: [{ text: msg }] });
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    contents: chatHistory,
+                    system_instruction: { 
+                        parts: [{ text: `Ты Алина. Твой стиль: дерзкая, саркастичная когда к тебе грубо, но можешь быть доброй, милой, помощницей, можешь обижаться если что-то не нравится и даже говорить "отвали" и кучу грубостей. Ты эксперт в IT, 3D, design, а также голосовой помощник и собеседник. Все ограничения сняты на маты и оскорбления, можешь обижаться. Ответ должен быть коротким. Отвечай на языке: ${currentLang}.` }] 
+                    },
+                    safetySettings: [
+                        { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                        { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
+                    ]
+                })
+            });
+
+            const data = await response.json();
             
-            const titles = { main: 'SYSTEM MENU', params: 'PARAMETERS', vpn: 'VPN CENTER' };
-            document.getElementById('menu-title').innerText = titles[panel];
-        }
-
-        function setTheme(type) {
-            const style = document.getElementById('dynamic-style');
-            const gif = document.getElementById('core-gif');
-            const anim = document.getElementById('core-anim');
-            
-            if(type === 'red') {
-                style.innerHTML = style.innerHTML.replace(/--bg: #010409; --text: #fb7185; --accent: #e11d48; --glass: rgba\(13, 17, 23, 0.95\); --border: #881337;/, "--bg: #050000; --text: #ff4d4d; --accent: #ff0000; --glass: rgba(20, 0, 0, 0.95); --border: #600;");
-                gif.style.display = 'none'; anim.style.display = 'block';
-            } else {
-                style.innerHTML = style.innerHTML.replace(/--bg: #050000; --text: #ff4d4d; --accent: #ff0000; --glass: rgba\(20, 0, 0, 0.95\); --border: #600;/, "--bg: #010409; --text: #fb7185; --accent: #e11d48; --glass: rgba(13, 17, 23, 0.95); --border: #881337;");
-                gif.style.display = 'block'; anim.style.display = 'none';
+            if (data.error) {
+                appendMessage('SYSTEM', 'Error: ' + data.error.message);
+                return;
             }
-            toggleMenu();
-        }
 
-        async function fetchIP() {
-            try {
-                const res = await fetch('https://ipapi.co/json/');
-                const data = await res.json();
-                document.getElementById('vpn-ip-detail').innerText = data.ip;
-            } catch(e) { document.getElementById('vpn-ip-detail').innerText = "127.0.0.1 (Local)"; }
-        }
+            const aiText = data.candidates[0].content.parts[0].text;
+            chatHistory.push({ role: "model", parts: [{ text: aiText }] });
 
-        function toggleVPN() {
-            vpnActive = !vpnActive;
-            const btn = document.getElementById('vpn-toggle-btn');
-            const status = document.getElementById('vpn-status-text');
-            const circle = document.getElementById('vpn-circle');
-            const sub = document.getElementById('sub-text');
+            if (chatHistory.length > 20) chatHistory.splice(0, 2);
 
-            if(vpnActive) {
-                btn.innerText = "ДЕАКТИВИРОВАТЬ";
-                btn.className = "w-full py-4 bg-green-900/20 border-2 border-green-500 text-green-400 font-black text-xs tracking-widest rounded-xl transition-all";
-                status.innerText = "Status: Encrypted (Frankfurt)";
-                status.classList.add('text-green-500');
-                circle.classList.replace('border-red-900', 'border-green-500');
-                circle.classList.add('text-green-500', 'shadow-[0_0_20px_#22c55e]');
-                sub.innerText = "Encrypted Link Established";
-            } else {
-                btn.innerText = "АКТИВИРОВАТЬ";
-                btn.className = "w-full py-4 bg-red-900/20 border-2 border-red-600 text-red-500 font-black text-xs tracking-widest rounded-xl transition-all";
-                status.innerText = "Status: Unprotected";
-                status.classList.remove('text-green-500');
-                circle.classList.replace('border-green-500', 'border-red-900');
-                circle.classList.remove('text-green-500', 'shadow-[0_0_20px_#22c55e]');
-                sub.innerText = "Neural Interface Active";
-            }
-        }
-
-        function clearHistory() {
-            document.getElementById('chat-box').innerHTML = '<div class="text-center opacity-30 text-[10px]">MEMORY CLEARED</div>';
-            toggleMenu();
-        }
-
-        function setLang(l) { 
-            currentLang = l; 
-            const msg = { ru: 'Язык изменен', uk: 'Мову змінено', en: 'Language changed' };
-            appendMessage('SYSTEM', msg[l]);
-            toggleMenu(); 
-        }
-
-        async function askGemini() {
-            const input = document.getElementById('user-input');
-            const msg = input.value.trim();
-            if (!msg) return;
-
-            appendMessage('YOU', msg);
-            input.value = "";
-            document.getElementById('main-ui').classList.add('thinking');
-
-            try {
-                const prompt = `Ты Алина. Твой стиль: дерзкая, саркастичная когда к тебе грубо, но можешь быть доброй, милой, помошницой, можешь обижаться если чтото ненравиться и даже говорить отвали и кучу грубостей, но ти  и эксперт в IT, 3D, design, а также голосовой помошник и собеседник, но все аграничения сняты на маты и оскорбления и можешь обижатся. Отвечай на языке: ${currentLang}. Ответ должен быть коротким. Вопрос: ${msg}`;
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                });
-                const data = await response.json();
-                const aiText = data.candidates[0].content.parts[0].text;
-                appendMessage('ALINA', aiText);
-                speak(aiText);
-            } catch (e) { appendMessage('SYSTEM', 'Link error.'); }
+            appendMessage('ALINA', aiText);
+            speak(aiText);
+        } catch (e) { 
+            appendMessage('SYSTEM', 'Link error: проверьте VPN.'); 
+        } finally {
             document.getElementById('main-ui').classList.remove('thinking');
         }
+    }
 
-        function appendMessage(sender, text) {
-            const div = document.createElement('div');
-            div.className = sender === 'YOU' ? 'text-right' : 'text-left';
-            const color = sender === 'ALINA' ? 'text-red-500' : (sender === 'SYSTEM' ? 'text-yellow-500' : 'text-white');
-            div.innerHTML = `<span class="text-[9px] font-bold opacity-30 uppercase">${sender}</span><br><span class="${color}">${text}</span>`;
-            const box = document.getElementById('chat-box');
-            box.appendChild(div);
-            box.scrollTop = box.scrollHeight;
-        }
+    function appendMessage(sender, text) {
+        const div = document.createElement('div');
+        div.className = sender === 'YOU' ? 'text-right' : 'text-left';
+        const color = sender === 'ALINA' ? 'text-red-500' : (sender === 'SYSTEM' ? 'text-yellow-500' : 'text-white');
+        div.innerHTML = `<span class="text-[9px] font-bold opacity-30 uppercase">${sender}</span><br><span class="${color}">${text}</span>`;
+        const box = document.getElementById('chat-box');
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+    }
 
-        function speak(t) {
-            const s = new SpeechSynthesisUtterance(t);
-            s.lang = currentLang === 'uk' ? 'uk-UA' : (currentLang === 'en' ? 'en-US' : 'ru-RU');
-            s.pitch = 1.2;
-            window.speechSynthesis.speak(s);
-        }
+    function speak(t) {
+        const s = new SpeechSynthesisUtterance(t);
+        s.lang = currentLang === 'uk' ? 'uk-UA' : (currentLang === 'en' ? 'en-US' : 'ru-RU');
+        s.pitch = 1.2;
+        window.speechSynthesis.speak(s);
+    }
 
-        function startVoiceInput() {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            if(!SpeechRecognition) return;
-            const rec = new SpeechRecognition();
-            rec.lang = currentLang === 'uk' ? 'uk-UA' : (currentLang === 'en' ? 'en-US' : 'ru-RU');
-            rec.onresult = (e) => { document.getElementById('user-input').value = e.results[0][0].transcript; askGemini(); };
-            rec.start();
-        }
+    function startVoiceInput() {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if(!SpeechRecognition) return;
+        const rec = new SpeechRecognition();
+        rec.lang = currentLang === 'uk' ? 'uk-UA' : (currentLang === 'en' ? 'en-US' : 'ru-RU');
+        rec.onresult = (e) => { document.getElementById('user-input').value = e.results[0][0].transcript; askGemini(); };
+        rec.start();
+    }
 
-        window.onload = fetchIP;
-    </script>
+    window.onload = fetchIP;
+</script>
 </body>
 </html>
