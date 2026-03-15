@@ -39,13 +39,13 @@
 
     <script>
         function activate(event) {
-            event.preventDefault(); // Чтобы страница не перезагружалась сразу
+            event.preventDefault(); 
             
             const user = document.getElementById('username').value.trim();
             const key = document.getElementById('keyInput').value.trim();
             
             if (key.startsWith('AIza')) {
-                // Сохраняем и имя, и ключ
+                
                 localStorage.setItem('ALINA_USER_NAME', user);
                 localStorage.setItem('ALINA_CORE_KEY', key);
                 
