@@ -247,32 +247,6 @@
                     ]
                 })
             });
-            try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-
-        const data = await response.json();
-        
-        // ПРОВЕРКА НА ЛИМИТЫ (Quota)
-        if (data.error && data.error.status === "RESOURCE_EXHAUSTED") {
-            return "Слышь, притормози! Я не робот... подожди минуту, у меня мозги кипят от твоих запросов.";
-        }
-
-        if (data.candidates && data.candidates[0].content) {
-            const reply = data.candidates[0].content.parts[0].text;
-            chatHistory.push({ role: "model", parts: [{ text: reply }] });
-            return reply;
-        } else {
-            return "Твой ключ или прокси сбоит. Глянь в консоль.";
-        }
-    } catch (e) {
-        return "Ошибка сети. Видимо, Cloudflare отдыхает.";
-    }
-}
-
             const data = await response.json();
             
             if (data.error) {
