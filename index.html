@@ -13,7 +13,7 @@
         .neon { color: var(--text); text-shadow: 0 0 10px var(--accent); }
         .glass { background: var(--glass); backdrop-filter: blur(10px); border: 1px solid var(--border); }
         
-        /* Лицо-Ядро */
+
         .alina-core {
             width: 120px; height: 120px;
             border-radius: 50%; border: 2px solid var(--accent);
@@ -136,12 +136,12 @@
     }
 
     const MODEL = "gemini-2.5-flash"; 
-    // Если сделаешь воркер Cloudflare, замени ссылку ниже на адрес воркера
+    
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`;
         
     let currentLang = 'ru';
     let vpnActive = false;
-    let chatHistory = []; // Память Алины
+    let chatHistory = []; 
 
     function toggleMenu() {
         const side = document.getElementById('sidebar');
@@ -207,7 +207,7 @@
     }
 
     function clearHistory() {
-        chatHistory = []; // Очищаем массив памяти
+        chatHistory = []; 
         document.getElementById('chat-box').innerHTML = '<div class="text-center opacity-30 text-[10px]">MEMORY CLEARED</div>';
         toggleMenu();
     }
