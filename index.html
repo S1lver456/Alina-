@@ -297,6 +297,52 @@
         rec.start();
     }
     
+    async function askAlina(userText) {
+    // 1. Добавляем сообщение пользователя в историю
+    chatHistory.push({ role: "user", parts: [{ text: userText }] });
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: chatHistory,
+                // Тут твой промт Алины (system_instruction)
+            })
+        });
+
+        const data = await response.json();
+
+        // 2. ОБРАБОТКА ОШИБОК ЛИМИТА И ПЕРЕГРУЗКИ
+        if (!response.ok) {
+            let errorMsg = "Системный сбой, бро.";
+            
+            if (response.status === 429) {
+                errorMsg = "Слышь, притормози. У меня мозги кипят, я не успеваю за твоим потоком мыслей. Дай мне минуту отдохнуть.";
+            } else if (response.status === 503 || response.status === 500) {
+                errorMsg = "Google прилёг отдохнуть. Видимо, слишком много рабов его мучают сейчас. Попробуй чуть позже.";
+            } else if (data.error) {
+                errorMsg = `Ошибка API: ${data.error.message}`;
+            }
+
+            // Вместо того чтобы падать, возвращаем ответ от имени Алины
+            return errorMsg;
+        }
+
+        // 3. Если всё ок, выводим ответ
+        if (data.candidates && data.candidates[0].content) {
+            const reply = data.candidates[0].content.parts[0].text;
+            chatHistory.push({ role: "model", parts: [{ text: reply }] });
+            return reply;
+        }
+
+        return "Она промолчала... Странно. Попробуй еще раз.";
+
+    } catch (e) {
+        console.error("Ошибка сети:", e);
+        return "Сеть легла. Проверь свой воркер или интернет.";
+    }
+}
 
     window.onload = fetchIP;
 </script>
