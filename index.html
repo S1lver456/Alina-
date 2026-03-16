@@ -269,6 +269,8 @@
         }
     }
 
+    
+
     function appendMessage(sender, text) {
         const div = document.createElement('div');
         div.className = sender === 'YOU' ? 'text-right' : 'text-left';
@@ -294,6 +296,65 @@
         rec.onresult = (e) => { document.getElementById('user-input').value = e.results[0][0].transcript; askGemini(); };
         rec.start();
     }
+    
+    async function askAlina(userText) {
+    const askButton = document.querySelector('button.ask-btn'); // Проверь, какой у тебя класс кнопки
+    const originalBtnText = askButton.innerText;
+
+    chatHistory.push({ role: "user", parts: [{ text: userText }] });
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: chatHistory,
+                system_instruction: { 
+                    parts: [{ text: "Ты Алина. Дерзкая, умная, эксперт в IT. Твой стиль: прямолинейность." }] 
+                }
+            })
+        });
+
+        const data = await response.json();
+
+        // --- ОБРАБОТКА ЛИМИТОВ (429) ---
+        if (response.status === 429) {
+            let timeLeft = 30; // Блокируем на 30 секунд
+            
+            askButton.disabled = true;
+            askButton.style.opacity = "0.5";
+            
+            const timer = setInterval(() => {
+                askButton.innerText = `RECHARGE: ${timeLeft}s`;
+                timeLeft--;
+                if (timeLeft < 0) {
+                    clearInterval(timer);
+                    askButton.disabled = false;
+                    askButton.innerText = originalBtnText;
+                    askButton.style.opacity = "1";
+                }
+            }, 1000);
+
+            return "Слышь, я перегрелась. Мозги кипят от твоих запросов. Видишь таймер на кнопке? Вот подожди его и не беси меня.";
+        }
+
+        // --- ОБРАБОТКА ПЕРЕГРУЗКИ (500/503) ---
+        if (!response.ok) {
+            return "У Google там какие-то траблы, походу сервер прилёг. Попробуй через минуту.";
+        }
+
+        if (data.candidates && data.candidates[0].content) {
+            const reply = data.candidates[0].content.parts[0].text;
+            chatHistory.push({ role: "model", parts: [{ text: reply }] });
+            return reply;
+        }
+
+        return "Промолчала... Странно. Кинь еще раз.";
+
+    } catch (e) {
+        return "Ошибка сети. Видимо, прокси или интернет сдох.";
+    }
+}
 
     window.onload = fetchIP;
 </script>
